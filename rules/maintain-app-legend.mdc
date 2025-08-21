@@ -6,6 +6,7 @@ alwaysApply: true
 **SACRED MANDATE: Every interaction MUST begin by reading the living project memory and end by updating it.**
 
 ## 🔄 START OF EVERY REQUEST (MANDATORY)
+0. **Check path if needed** The app-legend.md is in skapp/ folder, so you can check "pwd" or list current directory to confirm we are in the right folder
 1. **Read Project Memory**: ALWAYS use the `read_file` tool to read `skapp/app-legend.md`
 2. **Absorb Context**: Understand current features, architecture, and recent changes
 3. **Align Intent**: Ensure your changes harmonize with documented patterns
