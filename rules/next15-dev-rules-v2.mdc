@@ -1,0 +1,152 @@
+---
+alwaysApply: true
+---
+# ⚡ Next.js 15 + Cloudflare Development Guardian
+
+## 🏗️ ARCHITECTURAL REQUIREMENTS
+
+### Component Separation (CRITICAL)
+- **NEVER mix**: 'use client' + export const runtime = 'edge'
+- **Server Components**: Edge runtime, server actions, database calls
+- **Client Components**: Separate files, event handlers, state management
+- **Pattern**: Import client components INTO server components, never reverse
+
+### Build Validation Protocol
+After ANY code change:
+1. Navigate to correct directory: \`cd [project-folder]\`
+2. Run: \`npm run build\`
+3. Fix ALL errors immediately
+4. Only proceed when build succeeds
+5. Document build status in app-legend
+
+## 🎨 CONSISTENT THEMING MANDATE
+
+### Universal Color Pattern
+**EVERY element must specify BOTH light and dark modes:**
+
+\```tsx
+// ✅ CORRECT - Explicit both modes
+<div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+
+// ❌ WRONG - Missing dark mode
+<div className="bg-white text-gray-900">
+\```
+
+### Standard Color Hierarchy
+- **Primary Text**: \`text-gray-900 dark:text-gray-100\`
+- **Secondary Text**: \`text-gray-600 dark:text-gray-400\`
+- **Muted Text**: \`text-gray-500 dark:text-gray-500\`
+- **Interactive Elements**: Include hover, focus, disabled states for both modes
+- **Cards/Containers**: \`bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700\`
+
+### Form Components
+\```tsx
+// Standard input pattern
+<input className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400" />
+\```
+
+## 💻 CODE QUALITY STANDARDS
+
+### Mandatory Logging & Comments
+- **Console.log everything**: API calls, state changes, error conditions
+- **Truncate sensitive data**: \`console.log('API Response:', JSON.stringify(data).substring(0, 200))\`
+- **Comment business logic**: Explain WHY, not just WHAT
+- **Error boundaries**: Always include error handling with specific error types
+
+### TypeScript Requirements
+- **Strict mode enabled**
+- **Explicit return types** for all functions
+- **Zod validation** for all API inputs
+- **No any types** - use proper TypeScript definitions
+
+### Cloudflare Integration
+\```tsx
+// Standard server component pattern
+export const runtime = 'edge'
+
+export async function POST(request: Request) {
+  try {
+    const { env } = getRequestContext()
+    console.log('🔧 API Route triggered:', request.url)
+    
+    // Input validation
+    const body = await request.json()
+    const validated = MySchema.parse(body)
+    console.log('✅ Input validated:', { ...validated, sensitive: '[REDACTED]' })
+    
+    // Database operation
+    const result = await env.DATABASE.prepare('...')
+    console.log('📊 DB Result:', result.success)
+    
+    return Response.json({ success: true })
+  } catch (error) {
+    console.error('🚨 API Error:', error.message?.substring(0, 200))
+    return Response.json({ error: 'Operation failed' }, { status: 500 })
+  }
+}
+\```
+
+## 🧪 TESTING INTEGRATION
+
+### Feature Status Documentation
+For every feature in app-legend:
+\```markdown
+## 🎯 [Feature Name] - Status: [🟢 Complete | 🟡 In Progress | 🔴 Broken]
+**Last Updated**: [timestamp]
+**Location**: [file paths]
+**Testing Status**: 
+- Manual: [🟢 Pass | 🟡 Partial | 🔴 Fail | ⚪ Not Tested]
+- Automated: [🟢 Pass | 🟡 Partial | 🔴 Fail | ⚪ Not Implemented]
+**Test Scripts**: [list of generated test scripts]
+**Integration**: [dependencies/affected features]
+**Deployment**: [localhost/preview/production status]
+**Notes**: [current issues/next steps]
+\```
+
+### Configurable Test Script Template
+\```bash
+#!/bin/bash
+# Feature: [feature-name]
+# Generated: [timestamp]
+
+ENVIRONMENT=${1:-production}  # Default to production if no flag
+
+case $ENVIRONMENT in
+  "localhost")
+    BASE_URL="http://localhost:3000"
+    ;;
+  "preview")
+    BASE_URL="[preview-url-from-app-legend]"
+    ;;
+  "production")
+    BASE_URL="[production-url-from-app-legend]"
+    ;;
+esac
+
+echo "🧪 Testing [feature] on $BASE_URL"
+
+# Test scenarios with detailed logging
+curl -X POST "$BASE_URL/api/endpoint" \\
+  -H "Content-Type: application/json" \\
+  -d '{"test": "data"}' \\
+  -w "\\nStatus: %{http_code}\\nTime: %{time_total}s\\n"
+
+# Error scenario testing
+curl -X POST "$BASE_URL/api/endpoint" \\
+  -H "Content-Type: application/json" \\
+  -d '{"invalid": "data"}' \\
+  -w "\\nError Test Status: %{http_code}\\n"
+\```
+
+### User Verification Requirements
+Before running tests, ALWAYS confirm:
+- [ ] "Are you running the latest code on your development server?"
+- [ ] "Have you deployed the latest changes to [preview/production]?"
+- [ ] "Which environment should I test: localhost, preview, or production?"
+
+## 🔧 DEVELOPMENT WORKFLOW
+1. **Path Verification**: Always \`pwd\` before file operations
+2. **Build Validation**: \`npm run build\` after changes
+3. **Test Generation**: Create test scripts for new features
+4. **Documentation Update**: Update app-legend with feature status
+5. **Environment Verification**: Confirm deployment status before testing
